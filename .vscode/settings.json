@@ -1,9 +1,0 @@
-{
-    "cmake.sourceDirectory": "D:/programming/VSCode-C++/PsHelper",
-    "files.associations": {
-        "string": "cpp",
-        "functional": "cpp",
-        "vector": "cpp",
-        "iostream": "cpp"
-    }
-}
