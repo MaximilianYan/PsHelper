@@ -5,6 +5,5 @@ include_directories(headers)
 
 add_executable(${PROJECT_NAME}
                     sources/main.cpp
-                    sources/Menu.cpp
                     sources/Browser.cpp
                     )
