@@ -11,9 +11,9 @@ static COORD coord(const int x, const int y);
 
 Browser::Browser() :
     consoleHandle(GetStdHandle(STD_OUTPUT_HANDLE)),
-    fieldNames(),
-    fieldValues(),
-    state(STATE::WAIT_NAME) {
+    activeTree(new NodeSubtree("ERROR!!! IT IS INTERNAL INFORMATION")),
+    state(STATE::WAIT_NAME),
+    activeFieldI(-1) {
 
     // setlocale(LC_ALL, "ru_RU.UTF-8"); // for cyrillic letters
 
@@ -28,13 +28,15 @@ Browser::Browser() :
 }
 
 Browser::~Browser() {
+    //TODO: run up
+    delete activeTree;
 }
 
 void Browser::draw() {
     system("cls");
     SetConsoleCursorPosition(consoleHandle, coord(0, 0));
 
-    for (int i = 0; i < fieldNames.size(); ++i) {
+    for (int i = 0; i < activeTree->size(); ++i) {
         SetConsoleCursorPosition(consoleHandle, coord(0, 2 * i));
 
         if (i == 0) cout
@@ -46,23 +48,23 @@ void Browser::draw() {
             _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30
             _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _10;
 
-        if (i == 1/*inputTitleNum*/) {
+        if (i == activeFieldI) {
             SetConsoleTextAttribute(consoleHandle, CURSORCOLOR);
         } else {
             SetConsoleTextAttribute(consoleHandle, TEXTCOLOR);
         }
         SetConsoleCursorPosition(consoleHandle, coord(0, (i * 2) + 1));
-        cout _11 << fieldNames[i];
+        cout _11 << (*activeTree)[i]->getName();
         SetConsoleCursorPosition(consoleHandle, coord(31, (i * 2) + 1));
-        cout _04 << fieldValues[i];
+        cout _04 << (*activeTree)[i]->getValueView();
         SetConsoleCursorPosition(consoleHandle, coord(92, (i * 2) + 1));
         cout _11;
-        if (i == 1/*inputTitleNum*/) {
+        if (i == activeFieldI) {
             SetConsoleTextAttribute(consoleHandle, TEXTCOLOR);
         }
     }
 
-    SetConsoleCursorPosition(consoleHandle, coord(0, (fieldNames.size() * 2)));
+    SetConsoleCursorPosition(consoleHandle, coord(0, (activeTree->size() * 2)));
     cout
         _25 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _32
         _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30
@@ -79,13 +81,12 @@ void Browser::draw() {
         _25 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30
         _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30
         _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _30 _13;
-    SetConsoleCursorPosition(consoleHandle, coord(1, (fieldNames.size() * 2) + 2));
+    SetConsoleCursorPosition(consoleHandle, coord(1, (activeTree->size() * 2) + 2));
     cout.flush();
 }
 
 void Browser::addField(const string& name, const string& value) {
-    fieldNames.push_back(name);
-    fieldValues.push_back(value);
+    activeTree->addField(name, value);
 }
 
 void Browser::readInput() {
@@ -95,8 +96,9 @@ void Browser::readInput() {
     switch (state) {
     case STATE::WAIT_NAME:
 
-        for (const string& name : fieldNames) {
-            if (input == name) {
+        for (int i = 0; i < activeTree->size(); ++i) {
+            if (input == (*activeTree)[i]->getName()) {
+                activeFieldI = i;
                 break;
             }
         }

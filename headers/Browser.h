@@ -14,6 +14,10 @@
 #include <string>
 #include <vector>
 
+#include "BrowserNode.h"
+#include "NodeSubtree.h"
+#include "NodeInt.h"
+
  /**
  * @brief Class for displaying and interaction with commands
  *
@@ -25,15 +29,14 @@ public:
 
     void draw(); ///< Draw browser into console
 
-    void addField(const std::string& name, const std::string& value); ///< Add new line
+    void addField(const std::string& name, const std::string& value); ///< Add new node
 
     void readInput(); ///< Wait for input line
 
 private:
     HANDLE consoleHandle; ///< Handle of windows console
 
-    std::vector<std::string> fieldNames;
-    std::vector<std::string> fieldValues;
+    NodeSubtree* activeTree;
 
     enum STATE {
         WAIT_NAME = 0,
@@ -41,4 +44,5 @@ private:
     };
 
     STATE state;
+    int activeFieldI;
 };
